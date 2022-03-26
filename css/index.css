@@ -1,0 +1,19 @@
+body {
+  color: white;
+  background-color: black;
+  font-size: 1.6em;
+  margin-left: 30%;
+  margin-right:30%;
+}
+
+button{
+  margin-left: 10px;
+  margin-top: 15px;
+  height: 22px;
+  font-size: 14px;
+display: flex;
+}
+
+#btn {
+  display: flex;
+}
