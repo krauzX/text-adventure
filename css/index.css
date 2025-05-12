@@ -1,19 +1,938 @@
+:root {
+  /* Main colors */
+  --doom-red: #ff0000;
+  --doom-dark-red: #8b0000;
+  --doom-gray: #333333;
+  --doom-light-gray: #666666;
+  --doom-blue: #0000ff;
+  --doom-dark-blue: #000080;
+  --doom-green: #00ff00;
+  --doom-dark-green: #006400;
+  --doom-yellow: #ffff00;
+  --doom-orange: #ff7700;
+  --doom-purple: #800080;
+
+  /* UI colors */
+  --bg-color: #111;
+  --panel-bg: rgba(0, 0, 0, 0.9);
+  --text-color: #fff;
+  --text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+
+  /* Sizes */
+  --hud-height: 60px;
+  --inventory-height: 80px;
+  --scene-height: 350px;
+}
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  color: white;
-  background-color: black;
-  font-size: 1.6em;
-  margin-left: 30%;
-  margin-right:30%;
-}
-
-button{
-  margin-left: 10px;
-  margin-top: 15px;
-  height: 22px;
-  font-size: 14px;
-display: flex;
-}
-
-#btn {
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  font-family: "VT323", monospace;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  background-image: url("https://opengameart.org/sites/default/files/RTS_Crate_0.png");
+  background-blend-mode: overlay;
+  background-size: 100px;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* Text styles */
+.text-red {
+  color: var(--doom-red);
+}
+.text-blue {
+  color: var(--doom-blue);
+}
+.text-green {
+  color: var(--doom-green);
+}
+.text-yellow {
+  color: var(--doom-yellow);
+}
+
+/* Title screen */
+.title-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color);
+  background-image: url("https://cdna.artstation.com/p/assets/images/images/001/068/248/large/emerson-tung-final-battle.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.title-screen.hidden {
+  display: none;
+}
+
+.title-container {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 4px solid var(--doom-red);
+  border-radius: 5px;
+  padding: 30px;
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+}
+
+.game-title {
+  font-size: 4rem;
+  color: var(--doom-red);
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.title-image {
+  background-image: url("https://static.wikia.nocookie.net/doom/images/e/e3/Cyberdemon_idle.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 200px;
+  margin: 20px 0;
+}
+
+.title-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.title-btn {
+  background-color: var(--doom-gray);
+  color: var(--text-color);
+  border: 2px solid var(--doom-red);
+  border-radius: 5px;
+  padding: 12px 20px;
+  font-family: "VT323", monospace;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.title-btn:hover {
+  background-color: var(--doom-red);
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.title-select {
+  background-color: var(--doom-gray);
+  color: var(--text-color);
+  border: 2px solid var(--doom-red);
+  border-radius: 5px;
+  padding: 10px;
+  font-family: "VT323", monospace;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/* Main game container */
+.game-container {
+  background-color: var(--panel-bg);
+  border: 4px solid var(--doom-red);
+  border-radius: 5px;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+  width: 100%;
+  max-width: 1000px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+}
+
+.game-container.hidden {
+  display: none;
+}
+
+/* Top bar with controls */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--doom-gray);
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 2px solid var(--doom-dark-red);
+}
+
+.game-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.control-btn {
+  background-color: #222;
+  color: var(--text-color);
+  border: 1px solid var(--doom-red);
+  border-radius: 3px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.control-btn:hover {
+  background-color: var(--doom-dark-red);
+}
+
+.game-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.level-display {
+  font-weight: bold;
+  color: var(--doom-yellow);
+}
+
+.exp-bar {
+  width: 100px;
+  height: 10px;
+  background-color: #222;
+  border: 1px solid #444;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.exp-fill {
+  height: 100%;
+  background-color: var(--doom-green);
+  width: 30%;
+  transition: width 0.3s ease;
+}
+
+/* HUD with player stats */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--doom-gray);
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid var(--doom-dark-red);
+  height: var(--hud-height);
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat-label {
+  font-weight: bold;
+  color: var(--doom-yellow);
+}
+
+.progress-bar {
+  width: 100px;
+  height: 15px;
+  background-color: #222;
+  border: 1px solid #444;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--doom-red);
+  width: 100%;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.blue {
+  background-color: var(--doom-blue);
+}
+
+.weapon-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #222;
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: 1px solid var(--doom-red);
+}
+
+.weapon-icon {
+  height: 30px;
+  width: auto;
+  filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.5));
+}
+
+/* Main game area with mini-map and scene */
+.main-area {
+  display: flex;
+  gap: 15px;
+  position: relative;
+}
+
+/* Mini-map */
+.mini-map {
+  width: 150px;
+  height: var(--scene-height);
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--doom-gray);
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.mini-map.expanded {
+  width: 250px;
+  height: 400px;
+}
+
+.map-node {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: var(--doom-gray);
+  border: 1px solid #555;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.map-node.visited {
+  background-color: var(--doom-green);
+}
+
+.map-node.current {
+  background-color: var(--doom-red);
+  box-shadow: 0 0 5px var(--doom-red);
+}
+
+.map-node-start {
+  background-color: var(--doom-blue);
+}
+.map-node-info {
+  background-color: var(--doom-yellow);
+}
+.map-node-item {
+  background-color: var(--doom-green);
+}
+.map-node-combat {
+  background-color: var(--doom-red);
+}
+.map-node-boss {
+  background-color: var(--doom-orange);
+}
+.map-node-end {
+  background-color: var(--doom-purple);
+}
+
+.map-connection {
+  position: absolute;
+  height: 2px;
+  background-color: #555;
+  transform-origin: left center;
+}
+
+.map-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: var(--text-color);
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.map-node:hover .map-tooltip {
+  opacity: 1;
+}
+
+/* Scene container */
+.scene-container {
+  position: relative;
+  height: var(--scene-height);
+  background-color: #000;
+  border: 2px solid var(--doom-gray);
+  border-radius: 5px;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.scene-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8;
+  z-index: 1;
+  transition: background-image 0.5s ease;
+}
+
+.enemy-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.enemy-image {
+  max-height: 200px;
+  filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
+}
+
+.enemy-health-container {
+  width: 150px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--doom-red);
+  border-radius: 3px;
+  padding: 3px;
+  margin-top: 5px;
+}
+
+.enemy-health-bar {
+  height: 8px;
+  background-color: var(--doom-red);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.enemy-health-text {
+  color: var(--doom-red);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 2px;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+.text-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 15px;
+  z-index: 3;
+}
+
+.game-text {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  text-shadow: var(--text-shadow);
+  max-height: 150px;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+.combat-log {
+  font-size: 1rem;
+  color: var(--doom-yellow);
+  height: 60px;
+  overflow-y: auto;
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  display: none;
+  border: 1px solid #444;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.3;
+}
+
+/* Option buttons */
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn {
+  background-color: var(--doom-gray);
+  color: var(--text-color);
+  border: 2px solid var(--doom-red);
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-family: "VT323", monospace;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: var(--doom-red);
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.btn.combat-btn {
+  background-color: var(--doom-dark-red);
+  border-color: var(--doom-red);
+  color: var(--text-color);
+}
+
+.btn.combat-btn:hover {
+  background-color: var(--doom-red);
+  transform: scale(1.05);
+}
+
+/* Inventory */
+.inventory-container {
+  background-color: var(--doom-gray);
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid var(--doom-dark-red);
+  height: var(--inventory-height);
+}
+
+.inventory-title {
+  color: var(--doom-yellow);
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.inventory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 50px;
+  overflow-y: auto;
+  max-height: 50px;
+}
+
+.inventory-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #222;
+  border: 1px solid var(--doom-red);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.inventory-item:hover {
+  background-color: var(--doom-dark-red);
+  transform: translateY(-2px);
+}
+
+.item-icon {
+  height: 20px;
+  width: auto;
+}
+
+.item-count {
+  font-size: 0.8rem;
+  color: var(--doom-yellow);
+  margin-left: 3px;
+}
+
+.item-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: var(--text-color);
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.inventory-item:hover .item-tooltip {
+  opacity: 1;
+}
+
+/* Panels (Journal, Achievements, Help) */
+.panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--panel-bg);
+  border: 3px solid var(--doom-red);
+  border-radius: 5px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.panel.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: var(--doom-dark-red);
+  border-bottom: 2px solid var(--doom-red);
+}
+
+.panel-header h2 {
+  color: var(--text-color);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.close-panel {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Journal panel */
+.journal-content {
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.journal-entry {
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--doom-gray);
+  padding-bottom: 15px;
+}
+
+.journal-entry-header {
+  color: var(--doom-yellow);
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.journal-entry-content {
+  color: var(--text-color);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.journal-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: var(--doom-dark-red);
+  color: var(--text-color);
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 2px solid var(--doom-red);
+  font-size: 1rem;
+  transform: translateX(150%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.journal-notification.show {
+  transform: translateX(0);
+}
+
+/* Achievements panel */
+.achievements-list {
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 60vh;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.achievement-item {
+  background-color: var(--doom-gray);
+  border: 1px solid var(--doom-dark-red);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.achievement-name {
+  color: var(--doom-yellow);
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.achievement-description {
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.achievement-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: var(--doom-dark-red);
+  color: var(--text-color);
+  padding: 15px;
+  border-radius: 5px;
+  border: 2px solid var(--doom-yellow);
+  font-size: 1rem;
+  transform: translateX(150%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  width: 250px;
+}
+
+.achievement-notification.show {
+  transform: translateX(0);
+}
+
+.achievement-title {
+  color: var(--doom-yellow);
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Help panel */
+.help-content {
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.help-content h3 {
+  color: var(--doom-yellow);
+  margin: 15px 0 10px;
+}
+
+.help-content ul {
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+.help-content li {
+  margin-bottom: 8px;
+}
+
+/* Level up notification */
+.level-up-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: var(--text-color);
+  padding: 20px;
+  border-radius: 5px;
+  border: 3px solid var(--doom-green);
+  text-align: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  width: 300px;
+}
+
+.level-up-notification.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.level-up-title {
+  color: var(--doom-green);
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.level-up-level {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.level-up-bonus {
+  color: var(--doom-yellow);
+}
+
+/* Combat effects */
+@keyframes damage {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(2) saturate(2);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.damage-effect {
+  animation: damage 0.3s ease;
+}
+
+@keyframes heal {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5) hue-rotate(120deg);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.heal-effect {
+  animation: heal 0.5s ease;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  :root {
+    --scene-height: 300px;
+  }
+
+  body {
+    font-size: 1rem;
+    padding: 10px;
+  }
+
+  .game-container {
+    padding: 10px;
+  }
+
+  .main-area {
+    flex-direction: column;
+  }
+
+  .mini-map {
+    width: 100%;
+    height: 100px;
+  }
+
+  .mini-map.expanded {
+    height: 200px;
+  }
+
+  .hud {
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+  }
+
+  .btn-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-bar {
+    width: 70px;
+  }
+
+  .panel {
+    width: 95%;
+    max-height: 90vh;
+  }
+}
+
+@media (max-width: 500px) {
+  .game-title {
+    font-size: 2.5rem;
+  }
+
+  .title-image {
+    height: 150px;
+  }
+}
+
+/* Loading indicator */
+#loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid var(--doom-gray);
+  border-top: 5px solid var(--doom-red);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  color: var(--doom-red);
+  font-size: 1.5rem;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

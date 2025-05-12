@@ -1,195 +1,190 @@
-const textElement = document.getElementById('text')
-const optionButtonsElement = document.getElementById('option-buttons')
+/**
+ * Main entry point for the DOOM Text Adventure game
+ *
+ * This file initializes the game and creates the global game instance.
+ */
 
-let state = {}
+// Wait for DOM to be fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  // Show loading indicator
+  showLoadingIndicator();
 
-function startGame() {
-  state = {}
-  showTextNode(1)
-}
-
-function showTextNode(textNodeIndex) {
-  const textNode = textNodes.find(textNode => textNode.id === textNodeIndex)
-  textElement.innerText = textNode.text
-  while (optionButtonsElement.firstChild) {
-    optionButtonsElement.removeChild(optionButtonsElement.firstChild)
+  // Initialize audio manager
+  if (typeof AudioManager !== "undefined") {
+    AudioManager.init();
   }
 
-  textNode.options.forEach(option => {
-    if (showOption(option)) {
-      const button = document.createElement('button')
-      button.innerText = option.text
-      button.classList.add('btn')
-      button.addEventListener('click', () => selectOption(option))
-      optionButtonsElement.appendChild(button)
+  // Preload essential images
+  preloadGameAssets(() => {
+    // Hide loading indicator
+    hideLoadingIndicator();
+
+    // Create global game instance
+    window.game = new Game();
+
+    // Start the game
+    game.startGame();
+
+    // Add event listeners for global UI elements
+    setupGlobalEventListeners();
+  });
+});
+
+/**
+ * Preload game assets
+ * @param {Function} callback - Function to call when assets are loaded
+ */
+function preloadGameAssets(callback) {
+  // Collect all image paths to preload
+  const imagesToPreload = [];
+
+  // Add weapon images
+  Object.values(WeaponData).forEach((weapon) => {
+    if (weapon.icon) {
+      imagesToPreload.push(weapon.icon);
     }
-  })
-}
+  });
 
-function showOption(option) {
-  return option.requiredState == null || option.requiredState(state)
-}
+  // Add enemy images
+  Object.values(EnemyData).forEach((enemy) => {
+    if (enemy.image) {
+      imagesToPreload.push(enemy.image);
+    }
+  });
 
-function selectOption(option) {
-  const nextTextNodeId = option.nextText
-  if (nextTextNodeId <= 0) {
-    return startGame()
+  // Add item images
+  Object.values(ItemData).forEach((item) => {
+    if (item.icon) {
+      imagesToPreload.push(item.icon);
+    }
+  });
+
+  // Add background images
+  Object.values(BackgroundData).forEach((background) => {
+    if (background.image && typeof background.image === "string") {
+      imagesToPreload.push(background.image);
+    }
+  });
+
+  // Preload images
+  if (imagesToPreload.length > 0) {
+    ImageManager.preloadImages(imagesToPreload, callback);
+  } else {
+    callback();
   }
-  state = Object.assign(state, option.setState)
-  showTextNode(nextTextNodeId)
 }
 
-const textNodes = [
-  {
-    id: 1,
-    text: 'You wake up in a strange place and you see a jar of blue goo near you.',
-    options: [
-      {
-        text: 'Take the goo',
-        setState: { blueGoo: true },
-        nextText: 2
-      },
-      {
-        text: 'Leave the goo',
-        nextText: 2
-      }
-    ]
-  },
-  {
-    id: 2,
-    text: 'You venture forth in search of answers to where you are when you come across a merchant.',
-    options: [
-      {
-        text: 'Trade the goo for a sword',
-        requiredState: (currentState) => currentState.blueGoo,
-        setState: { blueGoo: false, sword: true },
-        nextText: 3
-      },
-      {
-        text: 'Trade the goo for a shield',
-        requiredState: (currentState) => currentState.blueGoo,
-        setState: { blueGoo: false, shield: true },
-        nextText: 3
-      },
-      {
-        text: 'Ignore the merchant',
-        nextText: 3
-      }
-    ]
-  },
-  {
-    id: 3,
-    text: 'After leaving the merchant you start to feel tired and stumble upon a small town next to a dangerous looking castle.',
-    options: [
-      {
-        text: 'Explore the castle',
-        nextText: 4
-      },
-      {
-        text: 'Find a room to sleep at in the town',
-        nextText: 5
-      },
-      {
-        text: 'Find some hay in a stable to sleep in',
-        nextText: 6
-      }
-    ]
-  },
-  {
-    id: 4,
-    text: 'You are so tired that you fall asleep while exploring the castle and are killed by some terrible monster in your sleep.',
-    options: [
-      {
-        text: 'Restart',
-        nextText: -1
-      }
-    ]
-  },
-  {
-    id: 5,
-    text: 'Without any money to buy a room you break into the nearest inn and fall asleep. After a few hours of sleep the owner of the inn finds you and has the town guard lock you in a cell.',
-    options: [
-      {
-        text: 'Restart',
-        nextText: -1
-      }
-    ]
-  },
-  {
-    id: 6,
-    text: 'You wake up well rested and full of energy ready to explore the nearby castle.',
-    options: [
-      {
-        text: 'Explore the castle',
-        nextText: 7
-      }
-    ]
-  },
-  {
-    id: 7,
-    text: 'While exploring the castle you come across a horrible monster in your path.',
-    options: [
-      {
-        text: 'Try to run',
-        nextText: 8
-      },
-      {
-        text: 'Attack it with your sword',
-        requiredState: (currentState) => currentState.sword,
-        nextText: 9
-      },
-      {
-        text: 'Hide behind your shield',
-        requiredState: (currentState) => currentState.shield,
-        nextText: 10
-      },
-      {
-        text: 'Throw the blue goo at it',
-        requiredState: (currentState) => currentState.blueGoo,
-        nextText: 11
-      }
-    ]
-  },
-  {
-    id: 8,
-    text: 'Your attempts to run are in vain and the monster easily catches.',
-    options: [
-      {
-        text: 'Restart',
-        nextText: -1
-      }
-    ]
-  },
-  {
-    id: 9,
-    text: 'You foolishly thought this monster could be slain with a single sword.',
-    options: [
-      {
-        text: 'Restart',
-        nextText: -1
-      }
-    ]
-  },
-  {
-    id: 10,
-    text: 'The monster laughed as you hid behind your shield and ate you.',
-    options: [
-      {
-        text: 'Restart',
-        nextText: -1
-      }
-    ]
-  },
-  {
-    id: 11,
-    text: 'You threw your jar of goo at the monster and it exploded. After the dust settled you saw the monster was destroyed. Seeing your victory you decide to claim this castle as your and live out the rest of your days there.',
-    options: [
-      {
-        text: 'Congratulations. Play Again.',
-        nextText: -1
-      }
-    ]
-  }
-]
+/**
+ * Show loading indicator
+ */
+function showLoadingIndicator() {
+  // Create loading indicator if it doesn't exist
+  let loadingIndicator = document.getElementById("loading-indicator");
 
-startGame()
+  if (!loadingIndicator) {
+    loadingIndicator = document.createElement("div");
+    loadingIndicator.id = "loading-indicator";
+    loadingIndicator.innerHTML = `
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading DOOM: Text Adventure...</div>
+    `;
+    document.body.appendChild(loadingIndicator);
+  }
+
+  loadingIndicator.style.display = "flex";
+}
+
+/**
+ * Hide loading indicator
+ */
+function hideLoadingIndicator() {
+  const loadingIndicator = document.getElementById("loading-indicator");
+
+  if (loadingIndicator) {
+    loadingIndicator.style.display = "none";
+  }
+}
+
+/**
+ * Set up event listeners for global UI elements
+ */
+function setupGlobalEventListeners() {
+  // Sound toggle
+  const soundToggle = document.getElementById("sound-toggle");
+  if (soundToggle) {
+    soundToggle.addEventListener("click", () => {
+      game.toggleSound();
+    });
+  }
+
+  // Journal toggle
+  const journalToggle = document.getElementById("journal-toggle");
+  if (journalToggle) {
+    journalToggle.addEventListener("click", () => {
+      game.toggleJournal();
+    });
+  }
+
+  // Mini-map toggle
+  const mapToggle = document.getElementById("map-toggle");
+  if (mapToggle) {
+    mapToggle.addEventListener("click", () => {
+      const miniMap = document.getElementById("mini-map");
+      if (miniMap) {
+        miniMap.classList.toggle("expanded");
+        mapToggle.textContent = miniMap.classList.contains("expanded")
+          ? "🗺️ Hide Map"
+          : "🗺️ Show Map";
+      }
+    });
+  }
+
+  // Achievements toggle
+  const achievementsToggle = document.getElementById("achievements-toggle");
+  if (achievementsToggle) {
+    achievementsToggle.addEventListener("click", () => {
+      const achievementsPanel = document.getElementById("achievements-panel");
+      if (achievementsPanel) {
+        achievementsPanel.classList.toggle("show");
+      }
+    });
+  }
+
+  // Difficulty select
+  const difficultySelect = document.getElementById("difficulty-select");
+  if (difficultySelect) {
+    difficultySelect.addEventListener("change", (e) => {
+      game.difficulty = e.target.value;
+      game.updateDifficulty();
+    });
+  }
+
+  // Start button on title screen
+  const startButton = document.getElementById("start-button");
+  if (startButton) {
+    startButton.addEventListener("click", () => {
+      game.startGame();
+    });
+  }
+
+  // Help button
+  const helpButton = document.getElementById("help-button");
+  if (helpButton) {
+    helpButton.addEventListener("click", () => {
+      const helpPanel = document.getElementById("help-panel");
+      if (helpPanel) {
+        helpPanel.classList.toggle("show");
+      }
+    });
+  }
+
+  // Close buttons for panels
+  document.querySelectorAll(".close-panel").forEach((button) => {
+    button.addEventListener("click", () => {
+      const panel = button.closest(".panel");
+      if (panel) {
+        panel.classList.remove("show");
+      }
+    });
+  });
+}
